@@ -47,7 +47,6 @@ bool writeTXT(const MyMatrixXf& mat, const char* filename) {
 int globalTest = 0;
 int dp_count = 0;
 clock_t myTime = 0;
-clock_t myTime_2 = 0;
 
 int main(int argc, char** argv)
 {
@@ -124,6 +123,7 @@ int main(int argc, char** argv)
     for (int m = 0; m < line_num; m++) {
         try {
             // Build point-face adjacency table
+            cout << "Embedding the line " << m << "." << endl;
             cout << m << endl;
             globalTest = m;
             dp_count = 0;
@@ -140,7 +140,7 @@ int main(int argc, char** argv)
             base_face_idx = holeFilling(base_face_idx, face, PFneighbor);
             base_face_idx = regionConnect(new_point, face, base_face_idx, PFneighbor);
             int base_face_num = base_face_idx.rows();
-            cout << "region projected!" << endl;
+            cout << "Line-to-mesh projection finished!" << endl;
             // LSM growing
             MyMatrixXf range_face_idx_ori = getKnnFace(tree, PFneighbor, face, line_set.block(2 * m, 0, 2, 3), sign, k_2, sample_interval_2);
             MyMatrixXf range_face_idx = MyUnion(range_face_idx_ori, base_face_idx);
@@ -160,12 +160,12 @@ int main(int argc, char** argv)
             MyMatrixXf extend_face_idx = regionExtend(face, range_face_idx, base_face_idx, normal, l2f_dist, PFneighbor, para_1_set(m, 0), extend_threshold);
             extend_face_idx = shapeRepairing(new_point, face, extend_face_idx, PFneighbor);
             extend_face_idx = holeFilling(extend_face_idx, face, PFneighbor);
-            cout << "region extended!" << endl;
+            cout << "LSM growing finished!" << endl;
             
             // LSM clipping
             MyMatrixXf segment_face_idx = regionSegment(new_point, face, extend_face_idx, base_face_idx, line_set.block(2 * m, 0, 2, 3), constrained_line_set, sample_interval_1);
             segment_face_idx = holeFilling(segment_face_idx, face, PFneighbor);
-            cout << "region segmented!" << endl;
+            cout << "LSM clipping finished!" << endl;
             if (haveConstrainedEdge(face, segment_face_idx, constrained_line_set))
                 continue;
 
@@ -178,7 +178,7 @@ int main(int argc, char** argv)
             //LSM retriangulation
             bool error = regionRemeshing(new_point, face, sign, segment_face_idx, node_idx, PFneighbor, constrained_line_set, 0.5, 0.5, m);
             if (error == false) {
-                cout << "remeshing successfully!" << endl;
+                cout << "LSM retriangulation finished!" << endl;
                 successful(m, 0) = 1;
             }
         }
@@ -189,8 +189,8 @@ int main(int argc, char** argv)
         }
     }
     end = clock();
-    cout << double(end - start) << endl; 
-    cout << double(myTime) << endl;
+    cout << "Overall runtime: " << double(end - start) << "." << endl;
+    cout << "Overall dynamic programming runtime: " << double(myTime) << "." << endl;
 
     string out_file = output_dir + "\\" + mesh_file + "_out.obj";
     saveMeshOBJ(new_point, face, sign, out_file.c_str());
