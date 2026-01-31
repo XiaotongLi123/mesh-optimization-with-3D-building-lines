@@ -1,12 +1,10 @@
-//文件读写函数定义
-//文件读写函数定义
-
+// File read/write function definitions
 #include "file.h"
 
 bool readMeshOBJ(MyMatrixXf& point, MyMatrixXf& face, const char* filename) {
     FILE* fp = fopen(filename, "r");
     if (fp == NULL) {
-        cout << "文件打开异常！" << endl;
+        cout << "File open error!" << endl;
         return false;
     }
     char attri;
@@ -14,7 +12,7 @@ bool readMeshOBJ(MyMatrixXf& point, MyMatrixXf& face, const char* filename) {
     MyMatrixXf face_ori = MyMatrixXf::Zero(9999999, 3);
     int pts_num = 0;
     int face_num = 0;
-    char line[256];  // 定义一个字符数组来临时存储注释
+    char line[256];  // Define a character array to temporarily store comments
     while (!feof(fp)) {
         fscanf(fp, "%c", &attri);
         if (attri == 'v') {
@@ -39,7 +37,7 @@ bool readMeshOBJ(MyMatrixXf& point, MyMatrixXf& face, const char* filename) {
 bool readLineOBJ(MyMatrixXf& line_set, const char* filename) {
     FILE* fp = fopen(filename, "r");
     if (fp == NULL) {
-        cout << "文件打开异常！" << endl;
+        cout << "File open error!" << endl;
         return false;
     }
     char attri;
@@ -60,7 +58,7 @@ bool readLineOBJ(MyMatrixXf& line_set, const char* filename) {
 bool saveMeshOBJ(MyMatrixXf point, MyMatrixXf face, MyMatrixXf sign, const char* filename) {
     FILE* fp = fopen(filename, "w");
     if (fp == NULL) {
-        cout << "文件打开异常！" << endl;
+        cout << "File open error!" << endl;
         return false;
     }
     for (int i = 0; i < point.rows(); i++) {
@@ -80,7 +78,7 @@ bool saveMeshOBJ(MyMatrixXf point, MyMatrixXf face, MyMatrixXf sign, const char*
 bool saveLineOBJ(MyMatrixXf line_set, const char* filename) {
     FILE* fp = fopen(filename, "w");
     if (fp == NULL) {
-        cout << "文件打开异常！" << endl;
+        cout << "File open error!" << endl;
         return false;
     }
     for (int i = 0; i < line_set.rows(); i++) {
@@ -96,7 +94,7 @@ bool saveLineOBJ(MyMatrixXf line_set, const char* filename) {
 bool readConstrainedEdgeTXT(MyMatrixXf& constrained_edge, const char* filename) {
     FILE* fp = fopen(filename, "r");
     if (fp == NULL) {
-        cout << "文件打开异常！" << endl;
+        cout << "File open error!" << endl;
         return false;
     }
     MyMatrixXf constrained_edge_ori = MyMatrixXf::Zero(999999, 2);
@@ -114,7 +112,7 @@ bool readConstrainedEdgeTXT(MyMatrixXf& constrained_edge, const char* filename) 
 bool saveSubMeshOBJ(MyMatrixXf point, MyMatrixXf face, MyMatrixXf region_face_idx, MyMatrixXf sign, const char* filename) {
     FILE* fp = fopen(filename, "w");
     if (fp == NULL) {
-        cout << "文件打开异常！" << endl;
+        cout << "File open error!" << endl;
         return false;
     }
     MyMatrixXf region_face = getSubMat_Rows(face, region_face_idx);
@@ -155,7 +153,7 @@ bool saveSubMeshOBJ(MyMatrixXf point, MyMatrixXf face, MyMatrixXf region_face_id
 bool saveSubMeshOBJ2(MyMatrixXf point, MyMatrixXf face, MyMatrixXf region_face_idx, MyMatrixXf sign, const char* filename) {
     FILE* fp = fopen(filename, "w");
     if (fp == NULL) {
-        cout << "文件打开异常！" << endl;
+        cout << "File open error!" << endl;
         return false;
     }
     MyMatrixXf region_face = getSubMat_Rows(face, region_face_idx);

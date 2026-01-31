@@ -4,15 +4,15 @@
 #include "omp.h"
 
 void createPFneighbor(const MyMatrixXf& point, const MyMatrixXf& face, MyMatrixXf& PFneighbor) {
-    //构建点面邻接表
+    // Build point-face adjacency table
     int pts_num = point.rows();
     int face_num = face.rows();
     int r;
-    PFneighbor = MyMatrixXf::Zero(pts_num, 30);//第一列存储邻接面数量，不超过29
+    PFneighbor = MyMatrixXf::Zero(pts_num, 30);// The first column stores the number of adjacent faces, no more than 29
     for (int i = 0; i < face_num; i++) {
         for (int j = 0; j < 3; j++) {
             r = face(i, j);
-            int this_PFneigh_num = PFneighbor(r, 0);//该点当前的面邻接数量
+            int this_PFneigh_num = PFneighbor(r, 0);// The current number of face adjacencies for this point
             if (this_PFneigh_num >= 29) {
                 continue;
             }
@@ -23,7 +23,7 @@ void createPFneighbor(const MyMatrixXf& point, const MyMatrixXf& face, MyMatrixX
 }
 
 MyMatrixXf regionFaceNormalAngle(const MyMatrixXf& point, const MyMatrixXf& face, const MyMatrixXf& region_face_idx, MyMatrixXf& region_edge_inside) {
-    //求线段支撑域相邻面的法向量夹角分布，以角度为单位
+    //Calculate the distribution of normal vector angles between adjacent faces in the line segment support domain in degrees
     int region_face_num = region_face_idx.rows();
     MyMatrixXf region_face = MyMatrixXf::Zero(region_face_num, 3);
     for (int i = 0; i < region_face_num; i++) {
@@ -50,7 +50,7 @@ MyMatrixXf regionFaceNormalAngle(const MyMatrixXf& point, const MyMatrixXf& face
     return normal_angle;
 }
 MyMatrixXf regionFaceNormalAngle(const MyMatrixXf& point, const MyMatrixXf& face, const MyMatrixXf& region_face_idx,int sign) {
-    //求线段支撑域相邻面的法向量夹角分布，以角度为单位
+    //Calculate the distribution of normal vector angles between adjacent faces in the line segment support domain in degrees
     MyMatrixXf region_face = getSubMat_Rows(face, region_face_idx);
     MyMatrixXf normal = getFacesNormal(point, region_face);
     MyMatrixXf region_point, region_edge;
@@ -171,8 +171,8 @@ bool haveConstrainedEdge(const MyMatrixXf& face, const MyMatrixXf& region_face_i
 }
 
 void getRegionPE(const MyMatrixXf& region_face, MyMatrixXf& region_point, MyMatrixXf& region_edge,int sign) {
-    //提取区域中的点和边，并对点和边进行标记（边界点和边标为0，内部点和边标为1，若出现非流形结构，边标记一般大于1）
-    //region_point为2列矩阵，region_face为3列矩阵
+    //Extract points and edges in the region and mark them (boundary points and edges marked as 0, internal points and edges marked as 1, if non-manifold structure exists, edge marks are generally greater than 1)
+    //region_point is a 2-column matrix, region_face is a 3-column matrix
     int region_face_num = region_face.rows();
     MyMatrixXf region_point_ori = MyMatrixXf::Zero(3 * region_face_num, 2);
     region_point_ori.col(1) = MyMatrixXf::Ones(3 * region_face_num, 1);
@@ -181,7 +181,7 @@ void getRegionPE(const MyMatrixXf& region_face, MyMatrixXf& region_point, MyMatr
     int region_point_num = 0;
     int r;
 
-    //提取区域中的边
+    //Extract edges in the region
     MyMatrixXf this_face = MyMatrixXf::Zero(1, 3);
     MyMatrixXf this_edge = MyMatrixXf::Zero(1, 2);
     MyMatrixXf exist_line_id;
@@ -216,7 +216,7 @@ void getRegionPE(const MyMatrixXf& region_face, MyMatrixXf& region_point, MyMatr
         }
     }
     region_edge = region_edge_ori.block(0, 0, region_edge_num, 3);
-    //提取区域中的端点
+    //Extract endpoints in the region
     MyMatrixXf row_index;
     MyMatrixXf col_index = MyMatrixXf::Ones(1, 1);
     for (int i = 0; i < region_edge_num; i++) {
@@ -250,7 +250,7 @@ float getRegionArea(const MyMatrixXf& point, const MyMatrixXf& face, const MyMat
 }
 
 MyMatrixXf getPointNeighFace(const MyMatrixXf& point, const MyMatrixXf& PFneighbor) {
-    //查询与点集相邻接的面(输入的是点的id)
+    //Query adjacent faces to the point set (input is point id)
     int point_num = point.rows();
     MyMatrixXf neigh_face_idx = MyMatrixXf::Zero(29 * point_num, 1);
     int neigh_face_num = 0;
@@ -268,8 +268,8 @@ MyMatrixXf getPointNeighFace(const MyMatrixXf& point, const MyMatrixXf& PFneighb
 }
 
 void getOutlineSort(const MyMatrixXf& region_face, MyMatrixXf& outline_point_sort, MyMatrixXf& outline_sort) {
-    //提取影响域的边界
-    //注意：若面按照逆时针存储（1，2——2，3——3，1），这里提取到的边界也是逆时针顺序
+    // Extract the boundary of the influence region
+    // Note: If the face is stored in counterclockwise order (1,2—2,3—3,1), the extracted boundary here is also in counterclockwise order
     MyMatrixXf region_point, region_edge;
     getRegionPE(region_face, region_point, region_edge);
 
@@ -282,13 +282,13 @@ void getOutlineSort(const MyMatrixXf& region_face, MyMatrixXf& outline_point_sor
         }
     }
 
-    //提取出按顺序排列的边界
+    //Extract boundary sorted in order
     outline_sort = regionEdgeSort(outline);
     outline_point_sort = outline_sort.col(0);
 }
 
 MyMatrixXf regionEdgeSort(MyMatrixXf outline) {
-    //将边界排序
+    //Sort the boundary
     int outline_num = outline.rows();
     MyMatrixXf t = MyMatrixXf::Zero(1, 2);
     for (int i = 0; i < outline_num - 1; i++) {
@@ -317,10 +317,6 @@ MyMatrixXf getFacesNormal(const MyMatrixXf& point, const MyMatrixXf& face) {
 
 MyMatrixXf getPerFaceNormal(const MyMatrixXf& tri) {
     MyMatrixXf normal = crossProduct(tri.row(1) - tri.row(0), tri.row(2) - tri.row(1));
-    /*if (globalTest == 12) {
-        cout << tri << endl << endl;
-        cout << normal << endl << endl;
-    }*/
     if (norm(normal) != 0) {
         normal = normal / norm(normal);
     }
@@ -328,7 +324,7 @@ MyMatrixXf getPerFaceNormal(const MyMatrixXf& tri) {
 }
 
 MyMatrixXf findPointNeighFace(const MyMatrixXf& face, float this_point) {
-    //寻找与当前点相邻接的三角面（输入点的id）
+    // Find triangles adjacent to the current point (input is point id)
     int face_num = face.rows();
     MyMatrixXf neigh_face_id = MyMatrixXf::Zero(face_num, 1);
     int count = 0;
@@ -342,7 +338,7 @@ MyMatrixXf findPointNeighFace(const MyMatrixXf& face, float this_point) {
 }
 
 MyMatrixXf findEdgeNeighFace(const MyMatrixXf& face, const MyMatrixXf& this_edge) {
-    //寻找与当前线段相邻接的三角面
+    // Find triangles adjacent to the current line segment
     int face_num = face.rows();
     MyMatrixXf neigh_face_id = MyMatrixXf::Zero(2, 1);
     int count = 0;
@@ -357,7 +353,7 @@ MyMatrixXf findEdgeNeighFace(const MyMatrixXf& face, const MyMatrixXf& this_edge
 }
 
 float findCertainNeighFace(const MyMatrixXf& face, const MyMatrixXf& face_idx, const MyMatrixXf& line, float this_face_idx) {
-    //寻找与当前面某一边相邻的另一个面
+    //Find another face adjacent to a certain edge of the current face
     float third_face_id = -1;
     int face_num = face.rows();
     for (int i = 0; i < face_num; i++) {
@@ -372,7 +368,7 @@ float findCertainNeighFace(const MyMatrixXf& face, const MyMatrixXf& face_idx, c
 }
 
 MyMatrixXf facePointUpdate(const MyMatrixXf& old_face, const MyMatrixXf& map) {
-    //基于map修改面表对应的点号
+    //Modify face table corresponding point numbers based on map
     int face_num = old_face.rows();
     int r;
     MyMatrixXf new_face = MyMatrixXf::Zero(face_num, 3);
@@ -386,7 +382,7 @@ MyMatrixXf facePointUpdate(const MyMatrixXf& old_face, const MyMatrixXf& map) {
 }
 
 MyMatrixXf findConnectRegion(const MyMatrixXf& face, const MyMatrixXf& region_face_idx) {
-    //将线段支撑域按照是否连通划分为不同的区域
+    //Divide line segment support domain into different regions based on connectivity
     MyMatrixXf region_face = getSubMat_Rows(face, region_face_idx);
     int region_face_num = region_face_idx.rows();
     MyMatrixXf connect_region = MyMatrixXf::Zero(region_face_num, region_face_num + 1);
@@ -397,7 +393,7 @@ MyMatrixXf findConnectRegion(const MyMatrixXf& face, const MyMatrixXf& region_fa
     MyMatrixXf new_face_idx = MyMatrixXf::Zero(1, face.rows());
     MyMatrixXf edge = MyMatrixXf::Zero(3, 2);
     while (region_face_sign.sum() != region_face_num) {
-        //选出新的连通区域的种子面，并进行相应的初始化操作
+        // Select the seed face of the new connected region and perform corresponding initialization operations
         seed = getIndex(region_face_sign, 0, 0);
         this_face_idx = getSubMat_Rows(region_face_idx, seed.block(0, 0, 1, 1));
         connect_region(connect_region_count, 0) = 1;
@@ -431,9 +427,9 @@ MyMatrixXf findConnectRegion(const MyMatrixXf& face, const MyMatrixXf& region_fa
 }
 
 MyMatrixXf findConnectEdge(const MyMatrixXf& edge) {
-    //寻找边的连通成分
-    //若连通成分的首尾点相同，则表示连通成分闭合
-    //考虑一点多连的情况（目前最多考虑一点三连）
+    //Find connected components of edges
+    //If the start and end points of a connected component are the same, the connected component is closed
+    //Consider cases where one point connects to multiple edges (currently up to three connections)
     int edge_num = edge.rows();
     int max_length = edge_num + 1;
     MyMatrixXf used = MyMatrixXf::Zero(edge_num, 1);
@@ -443,7 +439,7 @@ MyMatrixXf findConnectEdge(const MyMatrixXf& edge) {
     MyMatrixXf this_connect = -1 * MyMatrixXf::Ones(1, max_length);
     for (int i = 0; i < edge_num; i++) {
         if (used(i, 0) == 1)continue;
-        //初始化
+        //Initialize
         used(i, 0) = 1;
         this_connect = -1 * MyMatrixXf::Ones(1, max_length);
         int left_neigh = -1;

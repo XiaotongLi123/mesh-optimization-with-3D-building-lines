@@ -1,13 +1,13 @@
-//常用的数学函数的声明
+//锟斤拷锟矫碉拷锟斤拷学锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷
 #pragma once
 #include "class.h"
 #include <pcl/kdtree/kdtree_flann.h>
 
 extern int globalTest;
 
-//由线段两端点求解直线方程
+// Get the equation of a line given two points
 MyMatrixXf lineEquation(const MyMatrixXf& point_1, const MyMatrixXf& point_2);
-//求数组最大值，并返回最大值索引（如有相同只返回第一个的索引）（考虑改成模板）
+// If there are multiple maximum (or minimum) values, only the first one is returned (the others are ignored, which is a bug)
 template <typename T>
 T getMax(T* data, int data_num, int& max_index) {
     max_index = 0;
@@ -31,7 +31,7 @@ T getMax(T* data, int data_num) {
     return max;
 }
 float getMax(const MyMatrixXf& data, MyMatrixXf& max_index);
-//求数组最小值，并返回最小值索引（如有相同只返回第一个的索引）
+// Get the minimum value and its index in the data array
 template <typename T>
 T getMin(T* data, int data_num, int& min_index) {
     min_index = 0;
@@ -55,45 +55,39 @@ T getMin(T* data, int data_num) {
     return min;
 }
 float getMin(const MyMatrixXf& data, MyMatrixXf& min_index);
-//求向量的模长
+// Calculate the norm of a vector
 float norm(const MyMatrixXf& vec);
-//求两个向量的内积
+// Calculate the dot product of two vectors
 float dot(const MyMatrixXf& vec_1, const MyMatrixXf& vec_2);
-//求两个向量的夹角
+// Calculate the angle between two vectors
 float getVecAngle(const MyMatrixXf& vec_1, const MyMatrixXf& vec_2);
-//求两个直线的夹角，输入直线的方向向量
+// Calculate the angle between two lines
 float getLineAngle(const MyMatrixXf& vec_1, const MyMatrixXf& vec_2);
-//求两个向量的叉乘
+// Calculate the cross product of two vectors
 MyMatrixXf crossProduct(const MyMatrixXf& vec_1, const MyMatrixXf& vec_2);
-//求某个索引两侧k邻近的索引
+// Get indices of elements in a vector that satisfy a certain condition
 MyMatrixXf getNeighKidx(const MyMatrixXf& idx, int this_idx, int neigh_k);
-//判断三维空间点是否在三角平面内
+// Determine whether a point is inside a triangle
 bool isInTri(const MyMatrixXf& triangle, const MyMatrixXf& point);
-//计算三角面的面积
+// Calculate the area of a triangle
 float getTriArea(const MyMatrixXf& triangle);
-//创建k-d树
-//kdtree<float, 3> createKdtree(MyMatrixXf points, MyMatrixXf sign);
+// Create pcl kdtree
 pcl::KdTreeFLANN<pcl::PointXYZ> createKdtree(const MyMatrixXf& points);
-//进行knn搜索
-//int getNearestNeighbor(kdtree<float, 3> tree, MyMatrixXf search_point);
+// Get K nearest neighbors of a search point
 vector<int> getKneighbor(const pcl::KdTreeFLANN<pcl::PointXYZ>& kdtree, const MyMatrixXf& search_point, int K, const MyMatrixXf& sign);
 vector<int> getKneighbor(const pcl::KdTreeFLANN<pcl::PointXYZ>& kdtree, const MyMatrixXf& search_point, int K);
-//对数组的索引进行排序（降序,oper==0,升序,oper==1）
+// Sort indices based on corresponding values in a vector
 template <typename T>
 vector<size_t> sort_indexes(const vector<T>& v,int oper) {
-    // 初始化索引向量
     vector<size_t> idx(v.size());
-    //使用iota对向量赋0-?的连续值
     iota(idx.begin(), idx.end(), 0);
-
-    // 通过比较v的值对索引idx进行排序
     if (oper == 0)
         sort(idx.begin(), idx.end(), [&v](size_t i1, size_t i2) {return v[i1] > v[i2]; });
     else
         sort(idx.begin(), idx.end(), [&v](size_t i1, size_t i2) {return v[i1] < v[i2]; });
     return idx;
 }
-//求数组的平均值
+// Calculate the mean value
 template <typename T>
 T getMean(T* data, int num) {
     T sum = 0;
@@ -102,47 +96,43 @@ T getMean(T* data, int num) {
     }
     return sum / num;
 }
-//求数组的中值
+// Calculate the median value
 template <typename T>
 T getMedian(T* data, int num) {
     sort(data, data + num, greater<T>());
     if (num % 2 == 0) return (data[num / 2] + data[num / 2 - 1]) / 2;
     else return data[num / 2];
 }
-//求数组的q百分位数位置
+// Calculate the quantile value
 template <typename T>
 T getQuantile(T* data, int num, double q) {
-    // q 为 [0, 1] 之间的小数，如 0.5 表示中位数，0.25 表示 25% 分位点
-    if (num <= 0 || q < 0 || q > 1) return T();  // 边界检查
-
-    // 升序排序（与 MATLAB 的 sort(data, 'ascend') 一致）
+    // q is in the range [0, 1], e.g., 0.5 represents the median, 0.25 represents the 25th percentile
+    if (num <= 0 || q < 0 || q > 1) return T();  // boundary check
     std::sort(data, data + num);
-
-    // 百分位位置（ceil，与 MATLAB 一致）
-    int idx = static_cast<int>(std::ceil(num * q)) - 1;  // C++ 下标从 0 开始
+    int idx = static_cast<int>(std::ceil(num * q)) - 1;
     if (idx < 0) idx = 0;
     if (idx >= num) idx = num - 1;
 
     return data[idx];
 }
-//根据三点求平面方程的参数
+// Parameters of the least squares method
 MyMatrixXf getPlanePara(const MyMatrixXf& tri);
-//判断某元素是否在矩阵内
+// Determine whether a certain element exists in the set
 bool anyIsmember(const MyMatrixXf& data_set, float this_data);
 bool anyIsmember(const MyMatrixXf& data_set, const MyMatrixXf& target);
-//取矩阵的某些行
+// Get certain rows of the matrix
 MyMatrixXf getSubMat_Rows(const MyMatrixXf& mat, const MyMatrixXf& rows);
-//取矩阵的某些列
+// Get certain columns of the matrix
 MyMatrixXf getSubMat_Cols(const MyMatrixXf& mat, const MyMatrixXf& cols);
 
 MyMatrixXf getSubMat(const MyMatrixXf& mat, const MyMatrixXf& rows, const MyMatrixXf& cols);
-//给子矩阵赋值
+// Assign value to submatrix
 void valueSubMat(MyMatrixXf& mat, const MyMatrixXf& rows, const MyMatrixXf& cols, float value);
-//获得满足条件的向量索引
+// Get indices of elements in a vector that meet a certain condition
 MyMatrixXf getIndex(const MyMatrixXf& vec, float value, int oper);
-//矩阵转向量
+// Convert matrix to vector
 vector<float> mat2vec(const MyMatrixXf& mat);
-//向量转矩阵
+// Convert vector to matrix
 template <class T>
 MyMatrixXf vec2mat(vector<T> vec) {
     MyMatrixXf mat = MyMatrixXf::Zero(vec.size(), 1);
@@ -151,11 +141,9 @@ MyMatrixXf vec2mat(vector<T> vec) {
     }
     return mat;
 }
-//矩阵翻转
+// Flip the matrix
 MyMatrixXf matFlip(const MyMatrixXf& mat);
-//求并集
+// Set operations
 MyMatrixXf MyUnion(const MyMatrixXf& A, const MyMatrixXf& B);
-//求交集
 MyMatrixXf MyIntersection(const MyMatrixXf& A, const MyMatrixXf& B);
-//求差集
 MyMatrixXf MyDifference(const MyMatrixXf& A, const MyMatrixXf& B);

@@ -1,5 +1,4 @@
-//计算几何元素之间的距离函数的定义
-
+// Definition of functions to calculate distances between geometric elements
 #include "dist.h"
 #include "myMath.h"
 #include "lineProcess.h"
@@ -138,7 +137,7 @@ float point2segmentDist(const MyMatrixXf& point, const MyMatrixXf& line, MyMatri
         }
     }
     if (m == -1) {
-        cout << "线的两个端点重合！" << endl;
+        cout << "The two endpoints of the line coincide!" << endl;
         return dist;
     }
     float lambda = vec_3[m] / vec_4[m];
@@ -182,7 +181,7 @@ float point2segmentDist(const MyMatrixXf& point, const MyMatrixXf& line) {
         }
     }
     if (m == -1) {
-        cout << "线的两个端点重合！" << endl;
+        cout << "The two endpoints of the line coincide!" << endl;
         return dist;
     }
     float lambda = vec_3[m] / vec_4[m];

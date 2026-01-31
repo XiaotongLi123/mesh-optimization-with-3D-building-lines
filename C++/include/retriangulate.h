@@ -1,6 +1,5 @@
 #pragma once
 #include "class.h"
-#include "file.h"
 
 struct faceSet {
 	MyMatrixXf face_set;

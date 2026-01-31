@@ -2,46 +2,46 @@
 #include "class.h"
 extern int globalTest;
 
-//创建点面邻接表
+// Create point-face adjacency table
 void createPFneighbor(const MyMatrixXf& point, const MyMatrixXf& face, MyMatrixXf& PFneighbor);
-//求线段支撑域相邻面的法向量夹角分布，以角度为单位
+// Calculate the angle distribution (in degrees) between normals of adjacent faces in the supporting region of a line segment
 MyMatrixXf regionFaceNormalAngle(const MyMatrixXf& point, const MyMatrixXf& face, const MyMatrixXf& region_face_idx, MyMatrixXf& region_edge_inside);
 MyMatrixXf regionFaceNormalAngle(const MyMatrixXf& point, const MyMatrixXf& face, const MyMatrixXf& region_face_idx, int sign = 0);
-//判断点是否在点集中(点坐标)
+// Determine whether a point exists in the point set (by coordinates)
 bool isExistPoint(const MyMatrixXf& point_set, const MyMatrixXf& this_point, MyMatrixXf& exist_point_id);
 bool isExistPoint(const MyMatrixXf& point_set, const MyMatrixXf& this_point);
-//判断线是否在线集中
+// Determine whether a line exists in the line set
 bool isExistLine(const MyMatrixXf& line_set, const MyMatrixXf& this_line, MyMatrixXf& exist_line_id);
 bool isExistLine(const MyMatrixXf& line_set, const MyMatrixXf& this_line);
-//判断面是否在面集中
+// Determine whether a face exists in the face set
 bool isExistFace(const MyMatrixXf& face_set, const MyMatrixXf& this_face, MyMatrixXf& exist_face_id);
 bool isExistFace(const MyMatrixXf& face_set, const MyMatrixXf& this_face);
-//判断线段支撑域中是否存在约束线段
+// Determine whether there are constrained edges in the supporting region of a line segment
 bool haveConstrainedEdge(const MyMatrixXf& face, const MyMatrixXf& region_face_idx, const MyMatrixXf& constrained_edge);
-//提取区域中的点和边，并对点和边进行标记（边界点和边标为0，内部点和边标为1，若出现非流形结构，边标记一般大于1）
+// Extract points and edges in the region, and mark them (boundary points and edges are marked as 0, internal as 1, if non-manifold structure appears, edge mark is usually greater than 1)
 void getRegionPE(const MyMatrixXf& region_face, MyMatrixXf& region_point, MyMatrixXf& region_edge, int sign = 0);
-//求线段支撑域的面积（所有face的面积和）
+// Calculate the area of the supporting region of a line segment (sum of all face areas)
 float getRegionArea(const MyMatrixXf& point, const MyMatrixXf& face, const MyMatrixXf& region_face_idx);
-//查询与点集相邻接的面(输入的是点的id)
+// Query faces adjacent to the point set (input is point id)
 MyMatrixXf getPointNeighFace(const MyMatrixXf& point, const MyMatrixXf& PFneighbor);
-//提取影响域的边界
+// Extract the boundary of the influence region
 void getOutlineSort(const MyMatrixXf& region_face, MyMatrixXf& outline_point_sort, MyMatrixXf& outline_sort);
-//将边界排序
+// Sort the boundary
 MyMatrixXf regionEdgeSort(MyMatrixXf outline);
-//求每个face的法向量
+// Calculate the normal vector of each face
 MyMatrixXf getFacesNormal(const MyMatrixXf& point, const MyMatrixXf& face);
 MyMatrixXf getPerFaceNormal(const MyMatrixXf& tri);
-//寻找与当前点相邻接的三角面（输入点的id）
+// Find triangles adjacent to the current point (input is point id)
 MyMatrixXf findPointNeighFace(const MyMatrixXf& face, float this_point);
-//寻找与当前线段相邻接的三角面
+// Find triangles adjacent to the current line segment
 MyMatrixXf findEdgeNeighFace(const MyMatrixXf& face, const MyMatrixXf& this_edge);
-//寻找与当前面某一边相邻的另一个面
+// Find the other face adjacent to a certain edge of the current face
 float findCertainNeighFace(const MyMatrixXf& face, const MyMatrixXf& face_idx, const MyMatrixXf& line, float this_face_idx);
-//基于map修改面表对应的点号
+// Modify the point indices in the face table based on a map
 MyMatrixXf facePointUpdate(const MyMatrixXf& old_face, const MyMatrixXf& map);
-//将线段支撑域按照是否连通划分为不同的区域
+// Divide the supporting region of the line segment into different regions according to connectivity
 MyMatrixXf findConnectRegion(const MyMatrixXf& face, const MyMatrixXf& region_face_idx);
-//寻找边的连通成分
+// Find the connected components of edges
 MyMatrixXf findConnectEdge(const MyMatrixXf& edge);
-//取三角面的边
+// Get the edges of a triangle face
 MyMatrixXf getFaceEdge(const MyMatrixXf& face);

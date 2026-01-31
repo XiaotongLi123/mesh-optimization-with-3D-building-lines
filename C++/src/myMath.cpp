@@ -1,4 +1,4 @@
-//常用的数学函数定义
+// Common mathematical function definitions
 #include "myMath.h"
 #include "dist.h"
 
@@ -106,16 +106,16 @@ bool isInTri(const MyMatrixXf& triangle, const MyMatrixXf& point) {
     L3 << triangle.block(0, 0, 1, 3),
         triangle.block(1, 0, 1, 3);
 
-    //计算点到直线的距离
+    // Compute distances from the point to the three edges
     float D1 = point2lineDist(point, L1);
     float D2 = point2lineDist(point, L2);
     float D3 = point2lineDist(point, L3);
     float D = point2lineDist(triangle.block(0, 0, 1, 3), L1);
-    //计算三条线段的长度
+    // Compute lengths of the three edges
     float length_1 = point2pointDist(triangle.block(1, 0, 1, 3), triangle.block(2, 0, 1, 3));
     float length_2 = point2pointDist(triangle.block(2, 0, 1, 3), triangle.block(0, 0, 1, 3));
     float length_3 = point2pointDist(triangle.block(0, 0, 1, 3), triangle.block(1, 0, 1, 3));
-    //计算面积
+    // Compute areas
     float area = D * length_1 / 2;
     float area_1 = D1 * length_1 / 2;
     float area_2 = D2 * length_2 / 2;
@@ -139,24 +139,11 @@ float getTriArea(const MyMatrixXf& triangle) {
     return sqrt(p * (p - a) * (p - b) * (p - c));
 }
 
-//kdtree<float, 3> createKdtree(MyMatrixXf points, MyMatrixXf sign) {
-//    typedef point<float, 3> point3f;
-//    int pts_num = points.rows();
-//    vector<point3f> point_cloud(pts_num);
-//    for (int i = 0; i < pts_num; i++) {
-//        point3f point_i({ points(i,0),points(i,1) ,points(i,2) }, (size_t)sign(i, 0), i);
-//        point_cloud[i] = point_i;
-//    }
-//
-//    kdtree<float, 3> my_tree(std::begin(point_cloud), std::end(point_cloud));
-//    return my_tree;
-//}
 
 pcl::KdTreeFLANN<pcl::PointXYZ> createKdtree(const MyMatrixXf& points) {
-    // [1] 创建点云指针
+    // [1] Create a point cloud pointer
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-    // [2] 生成一千个无序点云数据
-      // Generate pointcloud data
+    // [2] Generate pointcloud data
     cloud->width = points.rows();
     cloud->height = 1;
     cloud->points.resize(cloud->width * cloud->height);
@@ -168,50 +155,29 @@ pcl::KdTreeFLANN<pcl::PointXYZ> createKdtree(const MyMatrixXf& points) {
         (*cloud)[i].z = points(i, 2);
     }
 
-    // [3]创建KD-Tree对象
+    // [3] Create KD-Tree object
     pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
-    // [4]向KDTREE中传入数据，即将点云数据设置成KD-Tree结构
+    // [4] Pass data into KDTREE, i.e., set point cloud data as KD-Tree structure
     kdtree.setInputCloud(cloud);
     return kdtree;
 }
-//flann::Index<flann::L2<float>> createKDtree(MatrixXf eigenMat) {
-//    // 分配内存并复制数据到 FLANN 矩阵
-//    flann::Matrix<float> flannMat(new float[eigenMat.rows() * eigenMat.cols()], eigenMat.rows(), eigenMat.cols());
-//    std::memcpy(flannMat.ptr(), eigenMat.data(), eigenMat.rows() * eigenMat.cols() * sizeof(float));
-//    flann::KDTreeIndexParams index_params(4); // 4是树的分支因子
-//    flann::Index<flann::L2<float>> index(flannMat, index_params);
-//    index.buildIndex();
-//    return index;
-//}
 
-//int getNearestNeighbor(kdtree<float, 3> tree, MyMatrixXf search_point) {
-//    // 根据构建的kd树搜索最邻近点
-//    typedef point<float, 3> point3f;
-//    point3f this_point({ search_point(0,0),search_point(0,1), search_point(0,2) }, -1, -1);
-//    return tree.nearest(this_point);
-//}
 vector<int> getKneighbor(const pcl::KdTreeFLANN<pcl::PointXYZ>& kdtree, const MyMatrixXf& search_point, int K, const MyMatrixXf& sign) {
-    // K近邻搜索
+    // K-nearest neighbor search
     std::vector<int> pointIdxKNNSearch(2 * K);
-    // 设置搜索距离
+    // Set search distance
     std::vector<float> pointKNNSquaredDistance(500);
     pcl::PointXYZ pcl_search_point;
     pcl_search_point.x = search_point(0, 0);
     pcl_search_point.y = search_point(0, 1);
     pcl_search_point.z = search_point(0, 2);
-    int count = 0;//统计当前搜索到的点的数量
+    int count = 0; // Statistics on the number of neighboring points searched so far
     vector<int> k_neigh(K, -1);
-    int sum = 0;//统计当前搜索到的邻近点数量
+    int sum = 0; // Statistics on the number of valid neighboring points found so far
     int this_search_num = 2 * K;
     while (count < kdtree.getInputCloud()->points.size()) {
         kdtree.nearestKSearch(pcl_search_point, this_search_num, pointIdxKNNSearch, pointKNNSquaredDistance);
-        //if (globalTest == 25) {
-        //    cout << pointIdxKNNSearch;
-        //}
         for (int i = this_search_num - 2 * K; i < this_search_num; i++) {
-            //if (globalTest == 25) {
-            //    cout << pointIdxKNNSearch[i] << " " << sign.rows() << endl;
-            //}
             if (sign(pointIdxKNNSearch[i], 0) == 1) {
                 k_neigh[sum++] = pointIdxKNNSearch[i];
             }
@@ -225,9 +191,9 @@ vector<int> getKneighbor(const pcl::KdTreeFLANN<pcl::PointXYZ>& kdtree, const My
     return k_neigh;
 }
 vector<int> getKneighbor(const pcl::KdTreeFLANN<pcl::PointXYZ>& kdtree, const MyMatrixXf& search_point, int K) {
-    // K近邻搜索
+    // K-nearest neighbor search
     std::vector<int> pointIdxKNNSearch(K);
-    // 设置搜索距离
+    // Set search distance
     std::vector<float> pointKNNSquaredDistance(100);
     pcl::PointXYZ pcl_search_point;
     pcl_search_point.x = search_point(0, 0);
@@ -237,36 +203,6 @@ vector<int> getKneighbor(const pcl::KdTreeFLANN<pcl::PointXYZ>& kdtree, const My
 
     return pointIdxKNNSearch;
 }
-//vector<int> getKneighbor(const flann::Index<flann::L2<float>>& kdtree, const MatrixXf& search_point, int K, const MatrixXf& sign, int search_max_num) {
-//    flann::Matrix<float> query_matrix(new float[search_point.cols()], 1, search_point.cols());
-//    for (size_t i = 0; i < search_point.cols(); ++i) {
-//        query_matrix[0][i] = search_point(0, i);
-//    }
-//
-//    // 进行k近邻搜索
-//    std::vector<int> indices(search_max_num);
-//    std::vector<float> dists(search_max_num);
-//
-//
-//    int count = 0;//统计当前搜索到的点的数量
-//    vector<int> k_neigh(K, -1);
-//    int sum = 0;//统计当前搜索到的邻近点数量
-//    int this_search_num = 2 * K;
-//    while (count < search_max_num) {
-//        flann::Matrix<int> indices_matrix(indices.data(), 1, this_search_num);
-//        flann::Matrix<float> dists_matrix(dists.data(), 1, this_search_num);
-//        kdtree.knnSearch(query_matrix, indices_matrix, dists_matrix, this_search_num, flann::SearchParams(64));
-//        for (int i = this_search_num - 2 * K; i < this_search_num; i++) {
-//            if (sign(indices_matrix[i][0], 0) == 1) {
-//                k_neigh[sum++] = indices_matrix[i][0];
-//            }
-//            if (sum == K)return k_neigh;
-//        }
-//        count += 2 * K;
-//        this_search_num += 2 * K;
-//    }
-//    return k_neigh;
-//}
 
 MyMatrixXf getPlanePara(const MyMatrixXf& tri) {
     MyMatrixXf S11 = MyMatrixXf::Zero(2, 2);
@@ -330,7 +266,7 @@ MyMatrixXf getSubMat_Rows(const MyMatrixXf& mat, const MyMatrixXf& rows) {
         }
         return sub_mat;
     }
-    cout << "rows 不是一个向量！" << endl;
+    cout << "rows is not a vector!" << endl;
     return sub_mat;
 }
 
@@ -353,7 +289,7 @@ MyMatrixXf getSubMat_Cols(const MyMatrixXf& mat, const MyMatrixXf& cols) {
         }
         return sub_mat;
     }
-    cout << "cols 不是一个向量！" << endl;
+    cout << "cols is not a vector!" << endl;
     return sub_mat;
 }
 
@@ -379,7 +315,7 @@ MyMatrixXf getIndex(const MyMatrixXf& vec, float value, int oper) {
     if (vec.rows() == 1) {
         for (int i = 0; i < vec.cols(); i++) {
             switch (oper) {
-                 //相等
+                 // Equal
             case 0: {
                 if (vec(i) == value) {
                     index(count) = i;
@@ -387,7 +323,7 @@ MyMatrixXf getIndex(const MyMatrixXf& vec, float value, int oper) {
                 }
                 break;
             }
-                 //不等
+                 // Not equal
             case 1: {
                 if (vec(i) != value) {
                     index(count) = i;
@@ -395,7 +331,7 @@ MyMatrixXf getIndex(const MyMatrixXf& vec, float value, int oper) {
                 }
                 break;
             }
-                 //大于
+                 // Larger than
             case 2: {
                 if (vec(i) > value) {
                     index(count) = i;
@@ -403,7 +339,7 @@ MyMatrixXf getIndex(const MyMatrixXf& vec, float value, int oper) {
                 }
                 break;
             }
-                 //小于
+                 // Smaller than
             case 3: {
                 if (vec(i) < value) {
                     index(count) = i;
@@ -412,7 +348,7 @@ MyMatrixXf getIndex(const MyMatrixXf& vec, float value, int oper) {
                 break;
             }
             default: {
-                cout << "操作有误！" << endl;
+                cout << "Invalid operation!" << endl;
                 return index;
             }
             }
@@ -422,7 +358,7 @@ MyMatrixXf getIndex(const MyMatrixXf& vec, float value, int oper) {
     if (vec.cols() == 1) {
         for (int i = 0; i < vec.rows(); i++) {
             switch (oper) {
-                 //相等
+                 // Equal
             case 0: {
                 if (vec(i) == value) {
                     index(count) = i;
@@ -430,7 +366,7 @@ MyMatrixXf getIndex(const MyMatrixXf& vec, float value, int oper) {
                 }
                 break;
             }
-                 //不等
+                 // Not equal
             case 1: {
                 if (vec(i) != value) {
                     index(count) = i;
@@ -438,7 +374,7 @@ MyMatrixXf getIndex(const MyMatrixXf& vec, float value, int oper) {
                 }
                 break;
             }
-                 //大于
+                 // Larger than
             case 2: {
                 if (vec(i) > value) {
                     index(count) = i;
@@ -446,7 +382,7 @@ MyMatrixXf getIndex(const MyMatrixXf& vec, float value, int oper) {
                 }
                 break;
             }
-                 //小于
+                 // Smaller than
             case 3: {
                 if (vec(i) < value) {
                     index(count) = i;
@@ -455,14 +391,14 @@ MyMatrixXf getIndex(const MyMatrixXf& vec, float value, int oper) {
                 break;
             }
             default: {
-                cout << "操作有误！" << endl;
+                cout << "Invalid operation!" << endl;
                 return index;
             }
             }
         }
         return index.block(0, 0, count, 1);
     }
-    cout << "输入不是一个向量！" << endl;
+    cout << "Input is not a vector!" << endl;
     return index;
 }
 

@@ -1,4 +1,4 @@
-//计算几何元素之间的距离函数的声明
+// Distance computation function between geometric elements (declaration)
 #pragma once
 #include "class.h"
 

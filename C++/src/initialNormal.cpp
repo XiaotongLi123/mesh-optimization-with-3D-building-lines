@@ -27,15 +27,6 @@ MyMatrixXf ransacGetAngleDistribution(const MyMatrixXf& point, const MyMatrixXf&
 			angle_d(initial_num++, 0) = temp;
 		}
 	}
-	//for (int i = 0; i < initial_num - 1; i++) {
-	//	for (int j = 0; j < initial_num - i - 1; j++) {
-	//		if (angle_d(j, 0) > angle_d(j + 1, 0)) {
-	//			float temp = angle_d(j, 0);
-	//			angle_d(j, 0) = angle_d(j + 1, 0);
-	//			angle_d(j + 1, 0) = temp;
-	//		}
-	//	}
-	//}
 	return angle_d.block(0, 0, initial_num, 1);
 }
 

@@ -5,16 +5,13 @@ clear; clc;
 dataSet = 'dublin';
 meshType = 'mesh_10000';
 para_1 = 30;
-para_2 = 0.6;
+para_2 = 0.7;
 node_interval = 0.03;
 dense_interval = node_interval / 20;
 sample_interval = node_interval * 5;
 
-% [point, face] = readMeshOBJ(['data\', dataSet, '\', meshType, '.obj']);
-% [line_set, ~] = readLineOBJ(['data\', dataSet, '\line.obj']);
-
-[point, face] = readMeshOBJ('mesh_dublin.obj');
-[line_set, ~] = readLineOBJ('line.obj');
+[point, face] = readMeshOBJ(['data\', dataSet, '\', meshType, '.obj']);
+[line_set, ~] = readLineOBJ(['data\', dataSet, '\line.obj']);
 
 line_num = size(line_set, 1) / 2; % Number of original lines
 pts_num = size(point, 1);         % Number of original points
@@ -32,7 +29,7 @@ tic;
 line_set = lineSort(line_set);
 
 for m = 1:line_num
-%     try
+    try
         m
         %------------Construct k-d tree------------
         KDmodel = KDTreeSearcher(point); % Build KD-tree
@@ -101,17 +98,11 @@ for m = 1:line_num
             pts_num = size(point, 1);
             reconstruct_line(m, 1) = 1;
         end
-%     catch
-%         error = error + 1;
-%         error_id(error, 1) = m;
-%         continue;
-%     end
+    catch
+        error = error + 1;
+        error_id(error, 1) = m;
+        continue;
+    end
 end
 toc;
 writeMeshOBJ(['data\', dataSet, '\', meshType, '_', num2str(para_1), '_', num2str(para_2), '.obj'], point, face);
-
-function [result] = getQuantile(data, q)
-    data_sort = sort(data, 'ascend');
-    idx = ceil(size(data, 1) * q);
-    result = data_sort(idx, 1);
-end

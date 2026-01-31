@@ -23,5 +23,3 @@ MyMatrixXf regionConnect(const MyMatrixXf& point, const MyMatrixXf& face, const 
 MyMatrixXf regionExtend(const MyMatrixXf& face, const MyMatrixXf& knn_face_idx, const MyMatrixXf& region_face_idx, const MyMatrixXf& normal, const MyMatrixXf& dist, const MyMatrixXf& PFneighbor, float threshold_1, float threshold_2, int max_loop = 200);
 
 MyMatrixXf regionSegment(const MyMatrixXf& point, const MyMatrixXf& face, const MyMatrixXf& region_face_idx, const MyMatrixXf& base_region_face_idx, const MyMatrixXf& line, const MyMatrixXf& constrained_edge, float interval);
-
-//MyMatrixXf regionSegment2(MyMatrixXf point, MyMatrixXf face, MyMatrixXf region_face_idx, MyMatrixXf base_region_face_idx, MyMatrixXf line, MyMatrixXf constrained_edge, MyMatrixXf connect_region_constrained_edge);

@@ -1,10 +1,10 @@
 #pragma once
 #include "class.h"
 
-//线段打点
+// Get equally spaced nodes along the line segment
 MyMatrixXf getNode(const MyMatrixXf& line, float interval);
 
-//线段按长度排序
+// Sort line segments by length
 void lineSort(MyMatrixXf& line);
 
 
