@@ -11,9 +11,7 @@ An accurate and efficient dynamic programming framework for optimizing building 
 This project implements an efficient dynamic programming-based framework for optimizing building meshes using 3D line constraints. The method refines existing meshes by leveraging 3D line segments to improve representation of edges and planes, without global remeshing.
 
 ### Algorithm Workflow
-
-![Algorithm Framework](picture/pipeline.jpg)
-
+<img src="picture/pipeline.jpg" width="100%" style="display:block; margin:auto;">
 The algorithm follows a comprehensive pipeline designed for efficient building mesh optimization with 3D line constraints:
 
 1. **Input Processing**: Accepts 3D lines and an existing mesh as input data
